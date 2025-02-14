@@ -38,7 +38,5 @@ Sargam Thakur
 
 ## Acknowledgments
 
-Used this video to start up project
-* https://www.youtube.com/watch?v=mKmxc8TcWQ8
-README.md template
-* https://gist.github.com/DomPizzie/7a5ff55ffa9081f2de27c315f5018afc
+* Used this video to start up project: https://www.youtube.com/watch?v=mKmxc8TcWQ8
+* README.md template: https://gist.github.com/DomPizzie/7a5ff55ffa9081f2de27c315f5018afc

@@ -1,3 +1,4 @@
+import './App.css';
 import React, { useEffect, useState } from 'react';
 import Calendar from './Calendar';
 
@@ -156,16 +157,18 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h1 className='home-title'>TimeWise</h1>
-      <p>TimeWise is an advanced scheduling platform designed to simplify the process of coordinating meetings across multiple time zones.</p>
+    <div className="app-container">
+      <header>
+        <h1 className='home-title'>TimeWise</h1>
+        <p>TimeWise is an advanced scheduling platform designed to simplify the process of coordinating meetings across multiple time zones.</p>
+      </header>
       {/* <h1>Google Calendar API Quickstart</h1> */}
       <button
         id="authorize_button"
         onClick={handleAuthClick}
         style={{ visibility: gapiInited && gisInited ? 'visible' : 'hidden' }}
       >
-        Authorize
+        Connect Google Calendar
       </button>
       <button
         id="signout_button"
@@ -178,7 +181,11 @@ const App = () => {
         {events.join('\n')}
       </pre> */}
 
-      <Calendar events={events} columns={columns} />
+      <div className="calendar-container">
+          <div className="calendar-wrapper">
+          <Calendar events={events} columns={columns} />
+        </div>
+      </div>
 
     </div>
   );

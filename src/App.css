@@ -36,3 +36,81 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* Center the calendar and give it a specific width */
+.calendar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Ensure it takes the full height of the viewport */
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+}
+
+.calendar-wrapper {
+  width: 80%;
+  max-width: 1200px;
+  margin: 0 auto; /* Center it horizontally */
+}
+
+/* Container for the entire app */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Title styling */
+.home-title {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #687ab1;
+  text-align: center;
+}
+
+/* Paragraph styling */
+p {
+  font-size: 1.2rem;
+  color: #555555;
+  font-family: sans-serif;
+  text-align: center;
+  max-width: 800px;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+/* Buttons styling */
+button {
+  background-color: #9999ff;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #99b1ff;
+}
+
+header {
+  text-align: center;
+}
+
+header p {
+  font-size: 1.1rem;
+  color: #555555;
+}
+
+#content {
+  font-size: 1.1rem;
+  color: #ff6347;
+  margin-top: 20px;
+}

@@ -2,7 +2,9 @@
 
 Advanced scheduling platform designed to simplify the process of coordinating meetings across multiple time zones.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Description
+
+While scheduling platforms like when2meet exist and allow for users to set their availability in different time zones, this tool will enhance the scheduling experience by incorporating features such as visual representations of different time zones, intelligent meeting suggestions, and time zone conflict resolution.
 
 ## Running program
 

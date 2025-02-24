@@ -75,8 +75,7 @@
 /* Paragraph styling */
 p {
   font-size: 1.2rem;
-  color: #555555;
-  font-family: sans-serif;
+  color: black;
   text-align: center;
   max-width: 800px;
   margin-bottom: 40px;

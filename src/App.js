@@ -103,11 +103,10 @@ const App = () => {
     let response;
     try {
 
-      const timeMin = new Date().toISOString(); // Current time
+      const timeMin = new Date().toISOString();
       const timeMax = new Date();
-      timeMax.setDate(timeMax.getDate() + 1); // 1 day from today
-      const timeMaxISOString = timeMax.toISOString(); // Convert to ISO string
-
+      timeMax.setDate(timeMax.getDate() + 1); // timespan of requested events is 24 hrs
+      const timeMaxISOString = timeMax.toISOString();
 
       const request = {
         calendarId: 'primary',
@@ -130,28 +129,25 @@ const App = () => {
       return;
     }
 
-    // Map Google Calendar events to DayPilotCalendar format
+    // map requested Google Calendar events to daypilot format
     const mappedEvents = eventsList.map((event) => {
       const startDateTime = event.start.dateTime || event.start.date;
       const endDateTime = event.end.dateTime || event.end.date;
     
-      // Slice the start and end date-time strings to remove the timezone offset
-      const formattedStartDateTime = startDateTime.slice(0, 19); // Remove timezone offset from start time
-      const formattedEndDateTime = endDateTime.slice(0, 19); // Remove timezone offset from end time
-      console.log("Event Start DateTime:", formattedStartDateTime); // Log the start date time
-      console.log("Event End DateTime:", formattedEndDateTime); // Log the end date time
+      const formattedStartDateTime = startDateTime.slice(0, 19); // remove timezone offset
+      const formattedEndDateTime = endDateTime.slice(0, 19);
+      console.log("Event Start DateTime:", formattedStartDateTime);
+      console.log("Event End DateTime:", formattedEndDateTime);
     
       return {
         id: event.id,
         text: event.summary,
         start: formattedStartDateTime,
         end: formattedEndDateTime,
-        resource: "R1", // This can be dynamically set based on your event's resource (e.g., a person's name)
-        barColor: "#00aaff", // Or dynamically set this as well
+        resource: "R1",
+        barColor: "#00aaff",
       };
-    });
-    
-    
+    });    
 
     setEvents(mappedEvents);
   };

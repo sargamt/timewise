@@ -8,7 +8,7 @@ While scheduling platforms like when2meet exist and allow for users to set their
 
 ## Running program
 
-In `/frontend`, create a .env file with CLIENT_ID and API_KEY from Google Cloud Platform - Google Calendar API.
+In root directory, create a .env file with CLIENT_ID and API_KEY from Google Cloud Platform - Google Calendar API.
 
 Then you can run:
 

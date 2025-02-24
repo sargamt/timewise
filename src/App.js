@@ -1,17 +1,3 @@
-// import logo from './logo.svg';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <h1>TimeWise</h1>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-
 import React, { useEffect, useState } from 'react';
 import Calendar from './Calendar';
 
@@ -28,6 +14,15 @@ const App = () => {
   const [tokenClient, setTokenClient] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [events, setEvents] = useState([]);
+  const [columns, setColumns] = useState([
+    { name: "Person 1", id: "R1" },
+    { name: "Person 2", id: "R2" },
+    { name: "Person 3", id: "R3" },
+    { name: "Person 4", id: "R4" },
+    { name: "Person 5", id: "R5" },
+    { name: "Person 6", id: "R6" },
+    { name: "Person 7", id: "R7" },
+  ]);
 
   // Load gapi client and GIS
   useEffect(() => {
@@ -134,8 +129,30 @@ const App = () => {
       return;
     }
 
-    const output = eventsList.map((event) => `${event.summary} (${event.start.dateTime || event.start.date})`).join('\n');
-    setEvents(output.split('\n'));
+    // Map Google Calendar events to DayPilotCalendar format
+    const mappedEvents = eventsList.map((event) => {
+      const startDateTime = event.start.dateTime || event.start.date;
+      const endDateTime = event.end.dateTime || event.end.date;
+    
+      // Slice the start and end date-time strings to remove the timezone offset
+      const formattedStartDateTime = startDateTime.slice(0, 19); // Remove timezone offset from start time
+      const formattedEndDateTime = endDateTime.slice(0, 19); // Remove timezone offset from end time
+      console.log("Event Start DateTime:", formattedStartDateTime); // Log the start date time
+      console.log("Event End DateTime:", formattedEndDateTime); // Log the end date time
+    
+      return {
+        id: event.id,
+        text: event.summary,
+        start: formattedStartDateTime,
+        end: formattedEndDateTime,
+        resource: "R1", // This can be dynamically set based on your event's resource (e.g., a person's name)
+        barColor: "#00aaff", // Or dynamically set this as well
+      };
+    });
+    
+    
+
+    setEvents(mappedEvents);
   };
 
   return (
@@ -157,11 +174,11 @@ const App = () => {
       >
         Sign Out
       </button>
-      <pre id="content" style={{ whiteSpace: 'pre-wrap' }}>
+      {/* <pre id="content" style={{ whiteSpace: 'pre-wrap' }}>
         {events.join('\n')}
-      </pre>
+      </pre> */}
 
-      <Calendar />  {/* This will display your calendar */}
+      <Calendar events={events} columns={columns} />
 
     </div>
   );

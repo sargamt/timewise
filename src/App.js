@@ -15,8 +15,10 @@
 import React, { useEffect, useState } from 'react';
 import Calendar from './Calendar';
 
-const CLIENT_ID = '468806073766-tum5giri2u34o2nl5bgi7tdbbsd1eanb.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyDAaWDe9otmbPV7JbrpDw-ZYscnan1pToA';
+require('dotenv').config();
+
+const CLIENT_ID = process.env.CLIENT_ID;
+const API_KEY = process.env.API_KEY;
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 

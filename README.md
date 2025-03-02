@@ -10,6 +10,10 @@ While scheduling platforms like when2meet exist and allow for users to set their
 
 In root directory, create a .env file with CLIENT_ID and API_KEY from Google Cloud Platform - Google Calendar API.
 
+First run:
+
+`npm install`
+
 Then you can run:
 
 `npm start`

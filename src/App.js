@@ -1,4 +1,5 @@
 import './App.css';
+import axios from "axios";
 import React, { useEffect, useState } from 'react';
 import Calendar from './Calendar';
 
@@ -15,6 +16,8 @@ const App = () => {
   const [tokenClient, setTokenClient] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [events, setEvents] = useState([]);
+  const [dbEvents, setDbEvents] = useState([]); // State to store events fetched from the DB
+
   const [columns, setColumns] = useState([
     { name: "Person 1", id: "R1" },
     { name: "Person 2", id: "R2" },
@@ -87,6 +90,26 @@ const App = () => {
       setIsAuthenticated(false);
     }
   };
+  const [nextPersonNumber, setNextPersonNumber] = useState(1);
+  
+  // ... existing code ...
+
+  // Fetch the next available person number when component mounts
+  useEffect(() => {
+    fetchNextAvailablePersonNumber();
+  }, []);
+  
+  // Function to get the next available person number
+  const fetchNextAvailablePersonNumber = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/counter/person");
+      setNextPersonNumber(response.data.value);
+      console.log("Next available person number:", response.data.value);
+    } catch (error) {
+      console.error("Error fetching next person number:", error);
+      setNextPersonNumber(1);
+    }
+  };
 
   const handleAuthResponse = async (resp) => {
     if (resp.error !== undefined) {
@@ -96,17 +119,29 @@ const App = () => {
     setIsAuthenticated(true);
     document.getElementById('signout_button').style.visibility = 'visible';
     document.getElementById('authorize_button').innerText = 'Refresh';
+    
+    // Fetch the next available person number before listing events
+    await fetchNextAvailablePersonNumber();
     await listUpcomingEvents();
   };
 
   const listUpcomingEvents = async () => {
     let response;
     try {
+      // Log at the beginning of function
+      console.log("Starting listUpcomingEvents...");
+      
+      // Get the current person number
+      const counterResponse = await axios.get("http://localhost:5000/api/counter/person");
+      const currentPersonNumber = counterResponse.data.value;
+      console.log("Current person number:", currentPersonNumber);
 
       const timeMin = new Date().toISOString();
       const timeMax = new Date();
-      timeMax.setDate(timeMax.getDate() + 1); // timespan of requested events is 24 hrs
+      timeMax.setDate(timeMax.getDate() + 1);
       const timeMaxISOString = timeMax.toISOString();
+      
+      console.log("Fetching events between:", timeMin, "and", timeMaxISOString);
 
       const request = {
         calendarId: 'primary',
@@ -117,48 +152,206 @@ const App = () => {
         maxResults: 100,
         orderBy: 'startTime',
       };
+      
+      console.log("Sending request to Google Calendar API...");
       response = await window.gapi.client.calendar.events.list(request);
+      console.log("Raw Google Calendar response:", response);
+
+      const eventsList = response.result.items;
+      console.log("Raw events from Google Calendar:", eventsList);
+      
+      if (!eventsList || eventsList.length === 0) {
+        console.log("No events found in Google Calendar for the specified time range.");
+        setEvents(['No events found.']);
+        return;
+      }
+
+      // Log that we have events
+      console.log(`Found ${eventsList.length} events in Google Calendar`);
+
+      // Use the current person number
+      const resourceId = `R${currentPersonNumber}`;
+      
+      const mappedEvents = eventsList.map((event, index) => {
+        const startDateTime = event.start.dateTime || event.start.date;
+        const endDateTime = event.end.dateTime || event.end.date;
+      
+        const formattedStartDateTime = startDateTime.slice(0, 19);
+        const formattedEndDateTime = endDateTime.slice(0, 19);
+        
+        console.log(`Processing event ${index + 1}:`, { 
+          id: event.id,
+          summary: event.summary,
+          start: formattedStartDateTime,
+          end: formattedEndDateTime 
+        });
+        
+        return {
+          id: event.id,
+          text: event.summary || "Google Calendar Event",
+          start: formattedStartDateTime,
+          end: formattedEndDateTime,
+          resource: resourceId,
+          person: currentPersonNumber,
+          barColor: "#4285F4",
+        };
+      });    
+
+      console.log("Mapped events for calendar:", mappedEvents);
+      
+      // Set events to the state before sending to DB
+      setEvents(mappedEvents);
+      console.log("Events state updated");
+      
+      // Send events to DB
+      await sendEventsToDB(mappedEvents, currentPersonNumber, resourceId);
+
     } catch (err) {
-      console.error('Error fetching events:', err);
+      console.error('Error in listUpcomingEvents:', err);
+      // Check for specific errors
+      if (err.result && err.result.error) {
+        console.error('Google API error details:', err.result.error);
+      }
       return;
     }
-
-    const eventsList = response.result.items;
-    if (!eventsList || eventsList.length === 0) {
-      setEvents(['No events found.']);
+  };
+  
+  // Modify the sendEventsToDB function to handle potential issues
+  const sendEventsToDB = async (eventsToSend, personNumber, resourceId) => {
+    console.log("Starting sendEventsToDB...");
+    
+    if (!eventsToSend || eventsToSend.length === 0 || eventsToSend[0] === 'No events found.') {
+      console.log("No events available to send to DB.");
       return;
     }
-
-    // map requested Google Calendar events to daypilot format
-    const mappedEvents = eventsList.map((event) => {
-      const startDateTime = event.start.dateTime || event.start.date;
-      const endDateTime = event.end.dateTime || event.end.date;
     
-      const formattedStartDateTime = startDateTime.slice(0, 19); // remove timezone offset
-      const formattedEndDateTime = endDateTime.slice(0, 19);
-      console.log("Event Start DateTime:", formattedStartDateTime);
-      console.log("Event End DateTime:", formattedEndDateTime);
+    console.log(`Preparing to send ${eventsToSend.length} events with person number:`, personNumber);
     
-      return {
-        id: event.id,
-        text: event.summary,
-        start: formattedStartDateTime,
-        end: formattedEndDateTime,
-        resource: "R1",
-        barColor: "#00aaff",
-      };
-    });    
+    try {
+      // Create unique IDs for each event to avoid conflicts
+      const formattedEvents = eventsToSend.map((event, index) => {
+        // Create a more unique ID to avoid conflicts
+        const uniqueId = `${event.id}_p${personNumber}_${new Date().getTime()}`;
+        
+        const formattedEvent = {
+          id: uniqueId,
+          text: event.text || "",
+          person: personNumber,
+          start: event.start,
+          end: event.end,
+          resource: `R${personNumber}`,
+          barColor: event.barColor || "#4285F4",
+          calendarID: "QKWVyy"
+        };
+        
+        console.log(`Formatted event ${index + 1}:`, formattedEvent);
+        return formattedEvent;
+      });
+      
+      console.log("Sending API request to save events...");
+      
+      // Send events in smaller batches to avoid potential issues
+      const batchSize = 10;
+      for (let i = 0; i < formattedEvents.length; i += batchSize) {
+        const batch = formattedEvents.slice(i, i + batchSize);
+        console.log(`Sending batch ${i/batchSize + 1} with ${batch.length} events`);
+        
+        try {
+          const response = await axios.post("http://localhost:5000/api/events", { events: batch });
+          console.log(`Batch ${i/batchSize + 1} response:`, response.data);
+        } catch (batchError) {
+          console.error(`Error with batch ${i/batchSize + 1}:`, batchError);
+        }
+      }
+      
+      // Increment the counter
+      console.log("Incrementing person counter...");
+      const counterResponse = await axios.post("http://localhost:5000/api/counter/increment");
+      const newCounterValue = counterResponse.data.value;
+      console.log("Counter incremented to:", newCounterValue);
+      
+      // Update local state
+      setNextPersonNumber(newCounterValue);
+      console.log("Next person number updated to:", newCounterValue);
+      
+      // Fetch the events back from the database to verify they were saved
+      console.log("Fetching events from database to verify save...");
+      await fetchEventsFromDB();
+      
+    } catch (error) {
+      console.error("Error adding events to DB:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+      alert("There was an error saving events. See console for details.");
+    }
+  };
+  
+  // Modify fetchEventsFromDB to add more debugging
+  const fetchEventsFromDB = async () => {
+    console.log("Starting fetchEventsFromDB...");
+    
+    try {
+      console.log("Sending request to get events from DB...");
+      const response = await axios.get("http://localhost:5000/api/events");
+      console.log("Raw response from DB:", response.data);
+      
+      if (!response.data.data || !Array.isArray(response.data.data)) {
+        console.error("Invalid response format from server:", response.data);
+        alert("Received invalid data format from server");
+        return;
+      }
+      
+      const dbEvents = response.data.data;
+      console.log(`Received ${dbEvents.length} events from DB`);
+      
+      if (dbEvents.length === 0) {
+        console.warn("No events found in database!");
+        alert("No events found in the database");
+        return;
+      }
 
-    setEvents(mappedEvents);
+      const mappedEvents = dbEvents.map((event, index) => {
+        const personNumber = event.person || 1;
+        const resourceId = `R${personNumber}`;
+        
+        const mappedEvent = {
+          id: event.id,
+          text: event.text || "DB Event",
+          person: personNumber,
+          start: event.start,
+          end: event.end,
+          resource: resourceId,
+          barColor: event.barColor || "#00aaff",
+          calendarID: event.calendarID || "QKWVyy"
+        };
+        
+        if (index < 5) { // Log only first 5 events to avoid console spam
+          console.log(`Mapped DB event ${index + 1}:`, mappedEvent);
+        }
+        return mappedEvent;
+      });
+
+      console.log("Setting events state with mapped DB events");
+      setEvents(mappedEvents);
+    } catch (error) {
+      console.error("Error fetching events from DB:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+      alert("Failed to fetch events from database.");
+    }
   };
 
+  
   return (
     <div className="app-container">
       <header>
         <h1 className='home-title'>TimeWise</h1>
         <p>TimeWise is an advanced scheduling platform designed to simplify the process of coordinating meetings across multiple time zones.</p>
       </header>
-      {/* <h1>Google Calendar API Quickstart</h1> */}
       <button
         id="authorize_button"
         onClick={handleAuthClick}
@@ -173,16 +366,27 @@ const App = () => {
       >
         Sign Out
       </button>
-      {/* <pre id="content" style={{ whiteSpace: 'pre-wrap' }}>
-        {events.join('\n')}
-      </pre> */}
-
+      <button
+        onClick={fetchEventsFromDB}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#00aaff",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
+        View Events from DB
+      </button>
+  
       <div className="calendar-container">
-          <div className="calendar-wrapper">
+        <div className="calendar-wrapper">
           <Calendar events={events} columns={columns} />
         </div>
       </div>
-
+      
+      {/* Remove the "Add Events to MongoDB" button since it's now automated */}
     </div>
   );
 };

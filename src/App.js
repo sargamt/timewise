@@ -16,6 +16,8 @@ const App = () => {
   const [tokenClient, setTokenClient] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [events, setEvents] = useState([]);
+  const [filterCalendarID, setFilterCalendarID] = useState('');
+
   const [dbEvents, setDbEvents] = useState([]); // State to store events fetched from the DB
 
   const [columns, setColumns] = useState([
@@ -27,6 +29,46 @@ const App = () => {
     { name: "Person 6", id: "R6" },
     { name: "Person 7", id: "R7" },
   ]);
+
+  const fetchEventsByCalendarID = async () => {
+    console.log("Starting fetchEventsByCalendarID with calendar ID:", filterCalendarID);
+  
+    if (!filterCalendarID.trim()) {
+      alert("Please enter a Calendar ID.");
+      return;
+    }
+  
+    try {
+      const response = await axios.get(`http://localhost:5000/api/events?calendarID=${filterCalendarID.trim()}`);
+      console.log("Filtered DB events response:", response.data);
+  
+      const data = response.data.data;
+  
+      if (!data || !Array.isArray(data)) {
+        console.error("Invalid response format for filtered events:", data);
+        alert("Invalid data received from server.");
+        return;
+      }
+  
+      const mappedEvents = data.map((event, index) => ({
+        id: event.id,
+        text: event.text || "Filtered DB Event",
+        person: event.person || 1,
+        start: event.start,
+        end: event.end,
+        resource: `R${event.person || 1}`,
+        barColor: event.barColor || "#00aaff",
+        calendarID: event.calendarID || "Unknown",
+      }));
+  
+      setEvents(mappedEvents);
+      console.log(`Loaded ${mappedEvents.length} filtered events from DB.`);
+    } catch (error) {
+      console.error("Error fetching filtered events:", error);
+      alert("Failed to fetch events by Calendar ID.");
+    }
+  };
+  
 
   // Load gapi client and GIS
   useEffect(() => {
@@ -192,7 +234,7 @@ const App = () => {
           resource: resourceId,
           person: currentPersonNumber,
           barColor: "#4285F4",
-          calendarID: "QKWVyy"
+          calendarID: "Q2WVyy"
         };
       });    
 
@@ -240,7 +282,7 @@ const App = () => {
           end: event.end,
           resource: `R${personNumber}`,
           barColor: event.barColor || "#4285F4",
-          calendarID: "QKWVyy"
+          calendarID: "Q2WVyy"
         };
         
         console.log(`Formatted event ${index + 1}:`, formattedEvent);
@@ -323,7 +365,7 @@ const App = () => {
           end: event.end,
           resource: resourceId,
           barColor: event.barColor || "#00aaff",
-          calendarID: event.calendarID || "QKWVyy"
+          calendarID: event.calendarID || "Q2WVyy"
         };
         
         if (index < 5) { // Log only first 5 events to avoid console spam
@@ -378,6 +420,36 @@ const App = () => {
       >
         View Events from DB
       </button>
+
+
+      <div style={{ marginTop: "20px" }}>
+  <input
+    type="text"
+    placeholder="Enter Calendar ID"
+    value={filterCalendarID}
+    onChange={(e) => setFilterCalendarID(e.target.value)}
+    style={{
+      padding: "8px",
+      marginRight: "10px",
+      borderRadius: "4px",
+      border: "1px solid #ccc"
+    }}
+  />
+  <button
+    onClick={fetchEventsByCalendarID}
+    style={{
+      padding: "8px 16px",
+      backgroundColor: "#28a745",
+      color: "white",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer"
+    }}
+  >
+    Fetch by Calendar ID
+  </button>
+</div>
+
   
       <div className="calendar-container">
         <div className="calendar-wrapper">

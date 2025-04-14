@@ -134,12 +134,12 @@ const App = () => {
   };
   const [nextPersonNumber, setNextPersonNumber] = useState(1);
 
-  // Fetch the next available person number when component mounts
+  // Fetch next available person number when component mounts
   useEffect(() => {
     fetchNextAvailablePersonNumber();
   }, []);
   
-  // Function to get the next available person number
+  // Function to get next available person number
   const fetchNextAvailablePersonNumber = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/counter/person");
@@ -160,7 +160,7 @@ const App = () => {
     document.getElementById('signout_button').style.visibility = 'visible';
     document.getElementById('authorize_button').innerText = 'Refresh';
     
-    // Fetch the next available person number before listing events
+    // Fetch next available person number before listing events
     await fetchNextAvailablePersonNumber();
     await listUpcomingEvents();
   };
@@ -171,7 +171,7 @@ const App = () => {
       // Log at the beginning of function
       console.log("Starting listUpcomingEvents...");
       
-      // Get the current person number
+      // Get current person number
       const counterResponse = await axios.get("http://localhost:5000/api/counter/person");
       const currentPersonNumber = counterResponse.data.value;
       console.log("Current person number:", currentPersonNumber);
@@ -305,17 +305,17 @@ const App = () => {
         }
       }
       
-      // Increment the counter
+      // increment counter
       console.log("Incrementing person counter...");
       const counterResponse = await axios.post("http://localhost:5000/api/counter/increment");
       const newCounterValue = counterResponse.data.value;
       console.log("Counter incremented to:", newCounterValue);
       
-      // Update local state
+      // update local state
       setNextPersonNumber(newCounterValue);
       console.log("Next person number updated to:", newCounterValue);
       
-      // Fetch the events back from the database to verify they were saved
+      // fetch events back from database to verify they were saved
       console.log("Fetching events from database to verify save...");
       await fetchEventsFromDB();
       
@@ -368,7 +368,7 @@ const App = () => {
           calendarID: event.calendarID || "Q2WVyy"
         };
         
-        if (index < 5) { // Log only first 5 events to avoid console spam
+        if (index < 5) { // Log only first 5 events to not have console spam
           console.log(`Mapped DB event ${index + 1}:`, mappedEvent);
         }
         return mappedEvent;
@@ -423,32 +423,32 @@ const App = () => {
 
 
       <div style={{ marginTop: "20px" }}>
-  <input
-    type="text"
-    placeholder="Enter Calendar ID"
-    value={filterCalendarID}
-    onChange={(e) => setFilterCalendarID(e.target.value)}
-    style={{
-      padding: "8px",
-      marginRight: "10px",
-      borderRadius: "4px",
-      border: "1px solid #ccc"
-    }}
-  />
-  <button
-    onClick={fetchEventsByCalendarID}
-    style={{
-      padding: "8px 16px",
-      backgroundColor: "#28a745",
-      color: "white",
-      border: "none",
-      borderRadius: "5px",
-      cursor: "pointer"
-    }}
-  >
-    Fetch by Calendar ID
-  </button>
-</div>
+        <input
+          type="text"
+          placeholder="Enter Calendar ID"
+          value={filterCalendarID}
+          onChange={(e) => setFilterCalendarID(e.target.value)}
+          style={{
+            padding: "8px",
+            marginRight: "10px",
+            borderRadius: "4px",
+            border: "1px solid #ccc"
+          }}
+        />
+        <button
+          onClick={fetchEventsByCalendarID}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          Fetch by Calendar ID
+        </button>
+      </div>
 
   
       <div className="calendar-container">

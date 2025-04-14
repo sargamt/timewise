@@ -3,10 +3,10 @@ import axios from "axios";
 import React, { useEffect, useState } from 'react';
 import Calendar from './Calendar';
 
-require('dotenv').config();
+//require('dotenv').config();
 
-const CLIENT_ID = process.env.CLIENT_ID;
-const API_KEY = process.env.API_KEY;
+const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+const API_KEY = process.env.REACT_APP_API_KEY;
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 
@@ -91,8 +91,6 @@ const App = () => {
     }
   };
   const [nextPersonNumber, setNextPersonNumber] = useState(1);
-  
-  // ... existing code ...
 
   // Fetch the next available person number when component mounts
   useEffect(() => {
@@ -194,6 +192,7 @@ const App = () => {
           resource: resourceId,
           person: currentPersonNumber,
           barColor: "#4285F4",
+          calendarID: "QKWVyy"
         };
       });    
 

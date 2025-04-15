@@ -487,8 +487,7 @@ const App = () => {
           <Calendar events={events} columns={columns} />
         </div>
       </div>
-      
-      {/* Remove the "Add Events to MongoDB" button since it's now automated */}
+
     </div>
   );
 };

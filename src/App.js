@@ -1,6 +1,6 @@
 import './App.css';
 import axios from "axios";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef  } from 'react';
 import Calendar from './Calendar';
 
 //require('dotenv').config();
@@ -17,6 +17,9 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [events, setEvents] = useState([]);
   const [filterCalendarID, setFilterCalendarID] = useState('');
+  const [selectedCalendarID, setSelectedCalendarID] = useState('');
+  const calendarIDRef = useRef('');
+
 
   const [dbEvents, setDbEvents] = useState([]); // State to store events fetched from the DB
 
@@ -58,7 +61,7 @@ const App = () => {
         end: event.end,
         resource: `R${event.person || 1}`,
         barColor: event.barColor || "#00aaff",
-        calendarID: event.calendarID || "Unknown",
+        calendarID: calendarIDRef.current || "Unknown",
       }));
   
       setEvents(mappedEvents);
@@ -116,6 +119,11 @@ const App = () => {
   };
 
   const handleAuthClick = () => {
+    // if (!selectedCalendarID.trim()) {
+    //   alert("Please enter a calendar ID before connecting.");
+    //   return;
+    // }
+    
     if (window.gapi.client.getToken() === null) {
       tokenClient.requestAccessToken({ prompt: 'consent' });
     } else {
@@ -208,7 +216,8 @@ const App = () => {
 
       // Log that we have events
       console.log(`Found ${eventsList.length} events in Google Calendar`);
-
+      const pp = (selectedCalendarID)
+      console.log("pp", pp)
       // Use the current person number
       const resourceId = `R${currentPersonNumber}`;
       
@@ -218,14 +227,15 @@ const App = () => {
       
         const formattedStartDateTime = startDateTime.slice(0, 19);
         const formattedEndDateTime = endDateTime.slice(0, 19);
-        
+
+
         console.log(`Processing event ${index + 1}:`, { 
           id: event.id,
           summary: event.summary,
           start: formattedStartDateTime,
           end: formattedEndDateTime 
         });
-        
+        console.log("Selected calendar ID used for mapping events:", selectedCalendarID);
         return {
           id: event.id,
           text: event.summary || "Google Calendar Event",
@@ -234,7 +244,7 @@ const App = () => {
           resource: resourceId,
           person: currentPersonNumber,
           barColor: "#4285F4",
-          calendarID: "Q2WVyy"
+          calendarID: calendarIDRef.current
         };
       });    
 
@@ -282,7 +292,7 @@ const App = () => {
           end: event.end,
           resource: `R${personNumber}`,
           barColor: event.barColor || "#4285F4",
-          calendarID: "Q2WVyy"
+          calendarID: calendarIDRef.current
         };
         
         console.log(`Formatted event ${index + 1}:`, formattedEvent);
@@ -393,6 +403,27 @@ const App = () => {
         <h1 className='home-title'>TimeWise</h1>
         <p>TimeWise is an advanced scheduling platform designed to simplify the process of coordinating meetings across multiple time zones.</p>
       </header>
+
+      <div style={{ marginBottom: "10px" }}>
+  <input
+    type="text"
+    placeholder="Enter Calendar ID to add events to"
+    value={selectedCalendarID}
+    onChange={(e) => {
+      setSelectedCalendarID(e.target.value);
+      calendarIDRef.current = e.target.value;
+    }}
+    style={{
+      padding: "8px",
+      width: "300px",
+      borderRadius: "4px",
+      border: "1px solid #ccc",
+      marginRight: "10px"
+    }}
+  />
+</div>
+
+
       <button
         id="authorize_button"
         onClick={handleAuthClick}

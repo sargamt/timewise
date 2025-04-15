@@ -403,7 +403,8 @@ const App = () => {
     <div className="app-container">
       <header>
         <h1 className='home-title'>TimeWise</h1>
-        <p>TimeWise is an advanced scheduling platform designed to simplify the process of coordinating meetings across multiple time zones.</p>
+        <p><strong>TimeWise is a scheduling platform designed to simplify the process of coordinating meetings across multiple time zones and calendars.</strong></p>
+        <p>Enter a pre-existing code to add your events to a group calendar. Else, create a new calendar group by entering a date and code of your choice.</p>
       </header>
 
       <div style={{ marginBottom: "10px" }}>
@@ -455,7 +456,7 @@ const App = () => {
       >
         Sign Out
       </button>
-      <button
+      {/* <button
         onClick={fetchEventsFromDB}
         style={{
           padding: "10px 20px",
@@ -467,7 +468,7 @@ const App = () => {
         }}
       >
         View Events from DB
-      </button>
+      </button> */}
 
 
       <div style={{ marginTop: "20px" }}>
@@ -487,8 +488,6 @@ const App = () => {
           onClick={fetchEventsByCalendarID}
           style={{
             padding: "8px 16px",
-            backgroundColor: "#28a745",
-            color: "white",
             border: "none",
             borderRadius: "5px",
             cursor: "pointer"

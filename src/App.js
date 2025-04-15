@@ -55,7 +55,7 @@ const App = () => {
   
       const mappedEvents = data.map((event, index) => ({
         id: event.id,
-        text: event.text || "Filtered DB Event",
+        text: "",
         person: event.person || 1,
         start: event.start,
         end: event.end,
@@ -238,7 +238,7 @@ const App = () => {
         console.log("Selected calendar ID used for mapping events:", selectedCalendarID);
         return {
           id: event.id,
-          text: event.summary || "Google Calendar Event",
+          text: "",
           start: formattedStartDateTime,
           end: formattedEndDateTime,
           resource: resourceId,
@@ -286,7 +286,7 @@ const App = () => {
         
         const formattedEvent = {
           id: uniqueId,
-          text: event.text || "",
+          text: "",
           person: personNumber,
           start: event.start,
           end: event.end,
@@ -369,7 +369,7 @@ const App = () => {
         
         const mappedEvent = {
           id: event.id,
-          text: event.text || "DB Event",
+          text: "",
           person: personNumber,
           start: event.start,
           end: event.end,

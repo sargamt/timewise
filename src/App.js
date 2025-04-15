@@ -19,6 +19,8 @@ const App = () => {
   const [filterCalendarID, setFilterCalendarID] = useState('');
   const [selectedCalendarID, setSelectedCalendarID] = useState('');
   const calendarIDRef = useRef('');
+  const [selectedDate, setSelectedDate] = useState('');
+
 
 
   const [dbEvents, setDbEvents] = useState([]); // State to store events fetched from the DB
@@ -405,6 +407,21 @@ const App = () => {
       </header>
 
       <div style={{ marginBottom: "10px" }}>
+
+      <div style={{ marginBottom: "10px" }}>
+  <label style={{ marginRight: "10px" }}>Select Date:</label>
+  <input
+    type="date"
+    value={selectedDate}
+    onChange={(e) => setSelectedDate(e.target.value)}
+    style={{
+      padding: "8px",
+      width: "200px",
+      borderRadius: "4px",
+      border: "1px solid #ccc"
+    }}
+  />
+</div>
   <input
     type="text"
     placeholder="Enter Calendar ID to add events to"

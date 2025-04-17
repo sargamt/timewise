@@ -1,0 +1,26 @@
+# Node.js dependencies
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Build and output directories (e.g., for transpiled code, test outputs, etc.)
+/dist
+/build
+/coverage
+
+# misc
+.env
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs (in case you have log files generated)
+*.log
+
+# npm debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

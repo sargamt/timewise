@@ -1,22 +1,48 @@
 # TimeWise
 
-Advanced scheduling platform designed to simplify the process of coordinating meetings across multiple time zones.
+TimeWise is a scheduling website designed to simplify the process of choosing meeting times compatible with the most participants, while accounting for multiple time zones.
+
+![Pic](./images/s1.png)
+![Pic2](./images/s2.png)
 
 ## Description
 
-While scheduling platforms like when2meet exist and allow for users to set their availability in different time zones, this tool will enhance the scheduling experience by incorporating features such as visual representations of different time zones, intelligent meeting suggestions, and time zone conflict resolution.
+This website displays a visual representation of overlapping schedules. This allows hosts to assess the optimal or most convenient meeting slots for all participants.
 
-## Running program
+## Getting Started
 
-In root directory, create a .env file with CLIENT_ID and API_KEY from Google Cloud Platform - Google Calendar API.
+### 1. Credentials
 
-First run:
+Before running the backend, create a `.env` file in the root directory and include your **Google Cloud Platform credentials**:
 
-`npm install`
+```
+REACT_APP_CLIENT_ID=your-google-client-id
+REACT_APP_API_KEY=your-google-api-key
+```
 
-Then you can run:
+### 2. Installations
 
-`npm start`
+Install the necessary dependencies.
+```
+cd backend
+npm install
+cd ../timewise
+npm install
+```
+
+### 3. Execute Program
+
+In one terminal,
+```
+cd backend
+node server.js
+```
+
+In another terminal,
+```
+cd timewise
+npm start
+```
 
 This runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
